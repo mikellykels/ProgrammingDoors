@@ -26,7 +26,7 @@ AMyCharacter::AMyCharacter()
 
 
 	TriggerCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Trigger Capsule"));
-	TriggerCapsule->InitCapsuleSize(55.f, 96.0f);
+	TriggerCapsule->InitCapsuleSize(28.0f, 88.0f);
 	TriggerCapsule->SetCollisionProfileName(TEXT("Trigger"));
 	TriggerCapsule->SetupAttachment(RootComponent);
 
