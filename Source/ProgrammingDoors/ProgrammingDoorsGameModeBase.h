@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Blueprint/UserWidget.h"
 #include "ProgrammingDoorsGameModeBase.generated.h"
 
 /**
@@ -13,5 +14,13 @@ UCLASS()
 class PROGRAMMINGDOORS_API AProgrammingDoorsGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+
+public:
+	void StartPlay() override;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> ObjectiveWidgetClass;
+
+	UUserWidget* ObjectiveWidget = nullptr;
 	
 };
