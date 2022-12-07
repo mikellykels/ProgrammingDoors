@@ -28,16 +28,10 @@ public:
 	// Sets default values for this component's properties
 	UDoorInteractionComponent();
 
-	DECLARE_EVENT(FDoorInteractionComponent, FOpened)
-	FOpened& OnOpened()
-	{
-		return OpenedEvent;
-	}
-
-	FOpened OpenedEvent;
-
 	static void OnDebugToggled(IConsoleVariable* var);
 	void DebugDraw();
+
+	void OnDoorOpen();
 
 protected:
 	// Called when the game starts
