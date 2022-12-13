@@ -25,6 +25,9 @@ public:
 	FString GetCurrentObjectiveDescription();
 
 	UFUNCTION(BlueprintCallable)
+	float GetScore();
+
+	UFUNCTION(BlueprintCallable)
 	void AddObjective(UObjectiveComponent* ObjectiveComponent);
 
 	UFUNCTION(BlueprintCallable)
@@ -38,4 +41,6 @@ private:
 	// add/remove them
 	// sign up for callback onchanged
 	TArray<UObjectiveComponent*> Objectives;
+
+	float Score = 0.0f;
 };

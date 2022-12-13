@@ -14,9 +14,10 @@ UENUM()
 enum class EDoorState
 {
 	DS_Closed = 0   UMETA(DisplayName = "Closed"),
-	DS_Opening = 1  UMETA(DisplayName = "Opening"),
-	DS_Open = 2     UMETA(DisplayName = "Open"),
-	DS_Locked = 3   UMETA(DisplayName = "Locked"),
+	DS_Closing = 1  UMETA(DisplayName = "Closing"),
+	DS_Opening = 2  UMETA(DisplayName = "Opening"),
+	DS_Open = 3     UMETA(DisplayName = "Open"),
+	DS_Locked = 4   UMETA(DisplayName = "Locked"),
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -32,6 +33,7 @@ public:
 	void DebugDraw();
 
 	void OnDoorOpen();
+	void OnDoorClose();
 
 protected:
 	// Called when the game starts
@@ -40,8 +42,13 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FRotator DesiredRotation = FRotator::ZeroRotator;
 
+	UPROPERTY(EditAnywhere)
+	FRotator DesiredCloseRotation = FRotator::ZeroRotator;
+
 	FRotator StartRotation = FRotator::ZeroRotator;
+	FRotator StartCloseRotation = FRotator::ZeroRotator;
 	FRotator FinalRotation = FRotator::ZeroRotator;
+	FRotator FinalCloseRotation = FRotator::ZeroRotator;
 
 	UPROPERTY(EditAnywhere)
 	float TimeToRotate = 1.0f;
@@ -53,6 +60,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	FRuntimeFloatCurve OpenCurve;
+
+	UPROPERTY(EditAnywhere)
+	FRuntimeFloatCurve CloseCurve;
 
 	UPROPERTY(BlueprintReadOnly)
 	EDoorState DoorState;

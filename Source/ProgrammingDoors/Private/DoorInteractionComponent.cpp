@@ -41,6 +41,9 @@ void UDoorInteractionComponent::BeginPlay()
 
 	StartRotation = GetOwner()->GetActorRotation();
 	FinalRotation = GetOwner()->GetActorRotation() + DesiredRotation;
+
+	StartCloseRotation = GetOwner()->GetActorRotation() + DesiredRotation;
+	FinalCloseRotation = GetOwner()->GetActorRotation();
 	// ensure TimeToRotation is greater than EPSILON
 	CurrentRotationTime = 0.0f;
 }
@@ -75,6 +78,30 @@ void UDoorInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 			OnDoorOpen();
 		}
 	}
+	else if (DoorState == EDoorState::DS_Open)
+	{
+		if (TriggerBox && GetWorld() && GetWorld()->GetFirstLocalPlayerFromController())
+		{
+			APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
+			if (PlayerPawn && !TriggerBox->IsOverlappingActor(PlayerPawn))
+			{
+				DoorState = EDoorState::DS_Closing;
+				CurrentRotationTime = 0.0f;
+			}
+		}
+	}
+	else if (DoorState == EDoorState::DS_Closing)
+	{
+		CurrentRotationTime += DeltaTime;
+		const float TimeRatio = FMath::Clamp(CurrentRotationTime / TimeToRotate, 0.0f, 1.0f);
+		const float RotationAlpha = CloseCurve.GetRichCurveConst()->Eval(TimeRatio);
+		const FRotator CurrentRotation = FMath::Lerp(StartCloseRotation, FinalCloseRotation, RotationAlpha);
+		GetOwner()->SetActorRotation(CurrentRotation);
+		if (TimeRatio >= 1.0f)
+		{
+			OnDoorClose();
+		}
+	}
 	DebugDraw();
 }
 
@@ -84,9 +111,20 @@ void UDoorInteractionComponent::OnDoorOpen()
 	UObjectiveComponent* ObjectiveComponent = GetOwner()->FindComponentByClass<UObjectiveComponent>();
 	if (ObjectiveComponent)
 	{
-		ObjectiveComponent->SetState(EObjectiveState::OS_Completed);
+		ObjectiveComponent->SetState(EObjectiveState::OS_Active);
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("DoorOpened"));
+}
+
+void UDoorInteractionComponent::OnDoorClose()
+{
+	DoorState = EDoorState::DS_Closed;
+	UObjectiveComponent* ObjectiveComponent = GetOwner()->FindComponentByClass<UObjectiveComponent>();
+	if (ObjectiveComponent)
+	{
+		ObjectiveComponent->SetState(EObjectiveState::OS_Completed);
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("DoorClosed"));
 }
 
 void UDoorInteractionComponent::OnDebugToggled(IConsoleVariable* Var)

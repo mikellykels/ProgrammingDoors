@@ -12,6 +12,7 @@ void UObjectiveWorldSubsystem::CreateObjectiveWidget(TSubclassOf<UUserWidget> Ob
 		ObjectiveWidget = CreateWidget<UUserWidget>(PlayerController, ObjectiveWidgetClass);
 	}
 }
+
 void UObjectiveWorldSubsystem::DisplayObjectiveWidget()
 {
 	ensureMsgf(ObjectiveWidget, TEXT("UObjectiveWorldSubsystem::DisplayObjectiveWidget ObjectiveWidget is nullptr"));
@@ -31,6 +32,15 @@ FString UObjectiveWorldSubsystem::GetCurrentObjectiveDescription()
 		RetObjective += TEXT("completed!");
 	}
 	return RetObjective;
+}
+
+float UObjectiveWorldSubsystem::GetScore()
+{
+	if (Objectives[0]->GetState() == EObjectiveState::OS_Completed)
+	{
+		Score = Score + 1;
+	}
+	return Score;
 }
 
 void UObjectiveWorldSubsystem::AddObjective(UObjectiveComponent* ObjectiveComponent)
