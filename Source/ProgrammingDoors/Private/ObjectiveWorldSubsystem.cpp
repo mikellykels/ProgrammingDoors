@@ -36,6 +36,10 @@ FString UObjectiveWorldSubsystem::GetCurrentObjectiveDescription()
 
 float UObjectiveWorldSubsystem::GetScore()
 {
+	if (!Objectives.IsValidIndex(0) || Objectives[0]->GetState() == EObjectiveState::OS_Inactive)
+	{
+		return 0.0f;
+	}
 	if (Objectives[0]->GetState() == EObjectiveState::OS_Completed)
 	{
 		Score = Score + 1;
