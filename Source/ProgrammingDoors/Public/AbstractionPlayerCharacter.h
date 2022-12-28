@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "HealthComponent.h"
 #include "AbstractionPlayerCharacter.generated.h"
 
 class UHealthComponent;
@@ -27,13 +28,13 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 
+	UPROPERTY(EditAnywhere)
+	UHealthComponent* HealthComponent;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void OnDeath(bool IsFellOut);
-
-	UPROPERTY(EditAnywhere)
-	UHealthComponent* HealthComponent;
 
 };

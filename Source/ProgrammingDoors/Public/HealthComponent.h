@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "HealthWidget.h"
 #include "HealthComponent.generated.h"
 
 
@@ -16,19 +17,49 @@ public:
 	// Sets default values for this component's properties
 	UHealthComponent();
 
+	DECLARE_EVENT_OneParam(FHealthComponent, FOnDamageTaken, UHealthComponent*)
+	FOnDamageTaken& OnDamageChanged()
+	{
+		return ChangedDamageEvent;
+	}
+
+	void DisplayHealth();
+
 	void TakeDamage(float Damage)
 	{
 		CurrentHealth -= Damage;
 	}
+
+	void TakeDamageEvent();
+
 
 	bool IsDead()
 	{
 		return CurrentHealth <= FLT_EPSILON;
 	}
 
+	float GetCurrentHealth() const
+	{
+		return CurrentHealth;
+	}
+
+	float GetMaxHealth() const
+	{
+		return MaxHealth;
+	}
+
+	FOnDamageTaken ChangedDamageEvent;
+
+private:
+	UPROPERTY()
+	UHealthWidget* HealthWidget = nullptr;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<UHealthWidget> HealthWidgetClass = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	float MaxHealth = 100.0f;

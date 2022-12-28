@@ -50,6 +50,7 @@ void UDealDamageComponent::OnOverlapBegin(class UPrimitiveComponent* OverlappedC
 		FDamageEvent DamageEvent(ValidDamageTypeClass);
 
 		PlayerCharacter->TakeDamage(BaseDamage, DamageEvent, nullptr, GetOwner());
+		PlayerCharacter->HealthComponent->DisplayHealth();
 	}
 }
 

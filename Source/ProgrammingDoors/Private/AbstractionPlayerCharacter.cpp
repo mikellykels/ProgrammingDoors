@@ -46,11 +46,15 @@ float AAbstractionPlayerCharacter::TakeDamage(float DamageAmount, struct FDamage
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	UE_LOG(LogTemp, Warning, TEXT("AAbstractionPlayerCharacter::TakeDamage Damage %.2f"), Damage);
+	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("%.2f Damage!"), Damage));
 	if (HealthComponent)
 	{
 		HealthComponent->TakeDamage(Damage);
+		HealthComponent->TakeDamageEvent();
+		//HealthComponent->ChangedDamageEvent.Broadcast();
 		if (HealthComponent->IsDead())
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red,TEXT("GAME OVER!"));
 			OnDeath(false);
 		}
 	}
