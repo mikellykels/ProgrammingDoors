@@ -13,7 +13,6 @@ AAbstractionPlayerCharacter::AAbstractionPlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-
 }
 
 // Called when the game starts or when spawned
@@ -45,7 +44,6 @@ void AAbstractionPlayerCharacter::FellOutOfWorld(const class UDamageType& dmgTyp
 float AAbstractionPlayerCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	UE_LOG(LogTemp, Warning, TEXT("AAbstractionPlayerCharacter::TakeDamage Damage %.2f"), Damage);
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("%.2f Damage!"), Damage));
 	if (HealthComponent)
 	{

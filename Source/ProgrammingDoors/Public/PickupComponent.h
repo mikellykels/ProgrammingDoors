@@ -3,19 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TimerWidget.h"
 #include "Components/ActorComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "PickupComponent.generated.h"
 
 class ATriggerBox;
-
-UENUM()
-enum class EPickupState
-{
-	PS_Inactive = 0 UMETA(DisplayName = "Inactive"),
-	PS_Active = 1   UMETA(DisplayName = "Active"),
-	PS_PickedUp = 2 UMETA(DisplayName = "Picked up")
-};
+class UCapsuleComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROGRAMMINGDOORS_API UPickupComponent : public UActorComponent
@@ -26,13 +20,39 @@ public:
 	// Sets default values for this component's properties
 	UPickupComponent();
 
-	void OnPickup();
-
-	UPROPERTY(BlueprintReadOnly)
-	EPickupState PickupState;
-
 	void Countdown();
 	void AddTime();
+	bool Triggered = false;
+
+	int GetMinutes() const
+	{
+		return Minutes;
+	}
+
+	int GetSeconds() const
+	{
+		return Seconds;
+	}
+
+	void DisplayTimer();
+
+	UFUNCTION()
+	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UCapsuleComponent* GetTriggerCapsule() const
+	{
+		return TriggerCapsule;
+	}
+
+protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, NoClear)
+	UCapsuleComponent* TriggerCapsule;
 
 	UPROPERTY(BlueprintReadOnly)
 	int Minutes = 1;
@@ -40,21 +60,13 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	int Seconds = 0;
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere)
-	ATriggerBox* TriggerBox;
-
-	UPROPERTY(BlueprintReadOnly)
-	bool Triggered;
-
 	FTimerHandle TimerHandle;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<UTimerWidget> TimerWidgetClass = nullptr;
 
+private:
+	UPROPERTY()
+	UTimerWidget* TimerWidget = nullptr;
 		
 };

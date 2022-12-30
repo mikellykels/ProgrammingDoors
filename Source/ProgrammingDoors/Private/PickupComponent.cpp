@@ -4,8 +4,9 @@
 #include "PickupComponent.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/PlayerController.h"
-#include "Engine/TriggerBox.h"
 #include "Engine/World.h"
+#include "Components/TextBlock.h"
+#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
@@ -14,8 +15,11 @@ UPickupComponent::UPickupComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	PickupState = EPickupState::PS_Active;
-	Triggered = false;
+
+	TriggerCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Trigger Capsule"));
+	TriggerCapsule->InitCapsuleSize(50.0f, 50.0f);
+	TriggerCapsule->OnComponentBeginOverlap.AddDynamic(this, &UPickupComponent::OnOverlapBegin);
+	TriggerCapsule->OnComponentEndOverlap.AddDynamic(this, &UPickupComponent::OnOverlapEnd);
 }
 
 
@@ -23,55 +27,20 @@ UPickupComponent::UPickupComponent()
 void UPickupComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UPickupComponent::Countdown, 1.f, true, 0.0);
-}
 
-
-// Called every frame
-void UPickupComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	if (PickupState == EPickupState::PS_Active)
+	if (IsValid(TimerWidgetClass))
 	{
-		if (TriggerBox && GetWorld() && GetWorld()->GetFirstLocalPlayerFromController())
-		{
-			APawn* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
-			if (PlayerPawn && TriggerBox->IsOverlappingActor(PlayerPawn))
-			{
-				OnPickup();
-			}
-		}
+		TimerWidget = CreateWidget<UTimerWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), TimerWidgetClass);
+		TimerWidget->AddToViewport(0);
 	}
-}
-
-void UPickupComponent::OnPickup()
-{
-	PickupState = EPickupState::PS_PickedUp;
-	Triggered = true;
-	GEngine->AddOnScreenDebugMessage(1, 3.0f, FColor::Yellow, TEXT("Item picked up: + :10 seconds"));
-
-	//UE_LOG(LogTemp, Error, TEXT("Active"));
-	//GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-	//GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UPickupComponent::AddTime);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UPickupComponent::Countdown, 1.f, true, 0.0);
 }
 
 void UPickupComponent::Countdown()
 {
-	bool Active = GetWorld()->GetTimerManager().IsTimerActive(TimerHandle);
-	if (Active)
-	{
-		//UE_LOG(LogTemp, Error, TEXT("Active"));
-	}
-	else if (!Active)
-	{
-		//UE_LOG(LogTemp, Error, TEXT("NOT Active"));
-	}
 	if (Seconds != 0)
 	{
 		Seconds = Seconds - 1;
-		//UE_LOG(LogTemp, Warning, TEXT("Active Seconds: %d"), Seconds);
 	}
 	else
 	{
@@ -87,46 +56,38 @@ void UPickupComponent::Countdown()
 
 		}
 	}
-	//bool Active = GetWorld()->GetTimerManager().IsTimerActive(TimerHandle);
+	DisplayTimer();
+}
 
-	//if (Active && Triggered) 
-	//{
-	//	UE_LOG(LogTemp, Error, TEXT("Active"));
-	//	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-	//	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-	//	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UPickupComponent::AddTime);
-	//}
-	//else if (!Active || !Triggered)
-	//{
-	//	if (PickupState == EPickupState::PS_PickedUp)
-	//	{
-	//		UE_LOG(LogTemp, Error, TEXT("PICKED UP"));
-	//	}
-
-	//	if (Seconds != 0)
-	//	{
-	//		Seconds = Seconds - 1;
-	//		UE_LOG(LogTemp, Warning, TEXT("Active Seconds: %d"), Seconds);
-	//	}
-	//	else
-	//	{
-	//		if (Minutes == 0)
-	//		{
-	//			// restart level if timer finished
-	//			UGameplayStatics::OpenLevel(GetWorld(), "MazeLevel");
-	//		}
-	//		else
-	//		{
-	//			Minutes = Minutes - 1;
-	//			Seconds = 59;
-
-	//		}
-	//	}
-	//}
+void UPickupComponent::DisplayTimer()
+{
+	FNumberFormattingOptions Opts;
+	Opts.SetMinimumIntegralDigits(2);
+	TimerWidget->MinutesLabel->SetText(FText::AsNumber(GetMinutes(), &Opts));
+	TimerWidget->SecondsLabel->SetText(FText::AsNumber(GetSeconds(), &Opts));
 }
 
 void UPickupComponent::AddTime()
 {
-	Triggered = false;
-	Seconds = Seconds + 10;
+	if (!Triggered)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("+ 10 Seconds!"));
+
+		Seconds = Seconds + 10;
+		if (Seconds > 59)
+		{
+			Minutes = Minutes + 1;
+			Seconds = Seconds - 60;
+		}
+	}
+}
+
+void UPickupComponent::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AddTime();
+	Triggered = true;
+}
+
+void UPickupComponent::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
 }
