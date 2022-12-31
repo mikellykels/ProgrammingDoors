@@ -3,37 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TimerWidget.h"
+#include "WinWidget.h"
 #include "Components/ActorComponent.h"
-#include "Blueprint/UserWidget.h"
-#include "PickupComponent.generated.h"
+#include "WinComponent.generated.h"
 
 class UCapsuleComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PROGRAMMINGDOORS_API UPickupComponent : public UActorComponent
+class PROGRAMMINGDOORS_API UWinComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UPickupComponent();
-
-	void Countdown();
-	void AddTime();
-	bool Triggered = false;
-
-	int GetMinutes() const
-	{
-		return Minutes;
-	}
-
-	int GetSeconds() const
-	{
-		return Seconds;
-	}
-
-	void DisplayTimer();
+	UWinComponent();
 
 	UFUNCTION()
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -46,6 +29,12 @@ public:
 		return TriggerCapsule;
 	}
 
+	void DisplayWinWidget();
+
+private:
+	UPROPERTY()
+	UWinWidget* WinWidget = nullptr;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -53,19 +42,12 @@ protected:
 	UPROPERTY(EditAnywhere, NoClear)
 	UCapsuleComponent* TriggerCapsule;
 
-	UPROPERTY(BlueprintReadOnly)
-	int Minutes = 1;
-
-	UPROPERTY(BlueprintReadOnly)
-	int Seconds = 0;
-
-	FTimerHandle TimerHandle;
-
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TSubclassOf<UTimerWidget> TimerWidgetClass = nullptr;
+	TSubclassOf<UUserWidget> WinWidgetClass = nullptr;
 
-private:
-	UPROPERTY()
-	UTimerWidget* TimerWidget = nullptr;
+public:	
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 		
 };

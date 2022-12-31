@@ -47,6 +47,7 @@ void UPickupComponent::Countdown()
 		if (Minutes == 0)
 		{
 			// restart level if timer finished
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("GAME OVER!"));
 			UGameplayStatics::OpenLevel(GetWorld(), "MazeLevel");
 		}
 		else

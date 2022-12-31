@@ -49,7 +49,6 @@ float AAbstractionPlayerCharacter::TakeDamage(float DamageAmount, struct FDamage
 	{
 		HealthComponent->TakeDamage(Damage);
 		HealthComponent->TakeDamageEvent();
-		//HealthComponent->ChangedDamageEvent.Broadcast();
 		if (HealthComponent->IsDead())
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red,TEXT("GAME OVER!"));
