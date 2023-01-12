@@ -54,7 +54,7 @@ protected:
 	UCapsuleComponent* TriggerCapsule;
 
 	UPROPERTY(BlueprintReadOnly)
-	int Minutes = 1;
+	int Minutes = 2;
 
 	UPROPERTY(BlueprintReadOnly)
 	int Seconds = 0;
