@@ -3,20 +3,65 @@
 
 #include "ObjectiveWorldSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "../ProgrammingDoorsGameModeBase.h"
+#include "Blueprint/UserWidget.h"
+#include "ObjectiveHud.h"
 
-void UObjectiveWorldSubsystem::CreateObjectiveWidget(TSubclassOf<UUserWidget> ObjectiveWidgetClass) 
+void UObjectiveWorldSubsystem::Deinitialize()
+{
+	ObjectiveWidget = nullptr;
+	ObjectivesCompleteWidget = nullptr;
+}
+
+void UObjectiveWorldSubsystem::CreateObjectiveWidgets() 
 {
 	if (ObjectiveWidget == nullptr)
 	{
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		ObjectiveWidget = CreateWidget<UUserWidget>(PlayerController, ObjectiveWidgetClass);
+		AProgrammingDoorsGameModeBase* GameMode = Cast<AProgrammingDoorsGameModeBase>(GetWorld()->GetAuthGameMode());
+		if (GameMode)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("IN GAME MODE"));
+			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+			ObjectiveWidget = CreateWidget<UObjectiveHud>(PlayerController, GameMode->ObjectiveWidgetClass);
+			ObjectivesCompleteWidget = CreateWidget<UUserWidget>(PlayerController, GameMode->ObjectivesCompleteWidgetClass);
+		}
 	}
 }
 
 void UObjectiveWorldSubsystem::DisplayObjectiveWidget()
 {
-	ensureMsgf(ObjectiveWidget, TEXT("UObjectiveWorldSubsystem::DisplayObjectiveWidget ObjectiveWidget is nullptr"));
-	ObjectiveWidget->AddToViewport();
+	if (ObjectiveWidget)
+	{
+		if (!ObjectiveWidget->IsInViewport())
+		{
+			ObjectiveWidget->AddToViewport();
+		}
+		ObjectiveWidget->UpdateObjectiveText(GetCompletedObjectiveCount(), Objectives.Num());
+	}
+}
+
+void UObjectiveWorldSubsystem::RemoveObjectiveWidget() 
+{
+	if (ObjectiveWidget)
+	{
+		ObjectiveWidget->RemoveFromViewport();
+	}
+}
+
+void UObjectiveWorldSubsystem::DisplayObjectivesCompleteWidget()
+{
+	if (ObjectivesCompleteWidget)
+	{
+		ObjectivesCompleteWidget->AddToViewport();
+	}
+}
+
+void UObjectiveWorldSubsystem::RemoveObjectivesCompleteWidget()
+{
+	if (ObjectivesCompleteWidget)
+	{
+		ObjectivesCompleteWidget->RemoveFromViewport();
+	}
 }
 
 FString UObjectiveWorldSubsystem::GetCurrentObjectiveDescription()
@@ -34,19 +79,6 @@ FString UObjectiveWorldSubsystem::GetCurrentObjectiveDescription()
 	return RetObjective;
 }
 
-float UObjectiveWorldSubsystem::GetScore()
-{
-	if (!Objectives.IsValidIndex(0) || Objectives[0]->GetState() == EObjectiveState::OS_Inactive)
-	{
-		return 0.0f;
-	}
-	if (Objectives[0]->GetState() == EObjectiveState::OS_Completed)
-	{
-		Score = Score + 1;
-	}
-	return Score;
-}
-
 void UObjectiveWorldSubsystem::AddObjective(UObjectiveComponent* ObjectiveComponent)
 {
 	check(ObjectiveComponent);
@@ -59,12 +91,49 @@ void UObjectiveWorldSubsystem::AddObjective(UObjectiveComponent* ObjectiveCompon
 	}
 }
 
-void UObjectiveWorldSubsystem::RemoveObjective(UObjectiveComponent* ObjectiveComponet)
+void UObjectiveWorldSubsystem::RemoveObjective(UObjectiveComponent* ObjectiveComponent)
 {
-	Objectives.Remove(ObjectiveComponet);
+	int32 numRemoved = ObjectiveComponent->OnStateChanged().RemoveAll(this);
+	check(numRemoved);
+	Objectives.Remove(ObjectiveComponent);
+}
+
+uint32 UObjectiveWorldSubsystem::GetCompletedObjectiveCount()
+{
+	uint32 ObjectivesCompleted = 0u;
+	for (const UObjectiveComponent* OC : Objectives)
+	{
+		if (OC && OC->GetState() == EObjectiveState::OS_Completed)
+		{
+			++ObjectivesCompleted;
+		}
+	}
+	return ObjectivesCompleted;
+}
+
+void UObjectiveWorldSubsystem::OnMapStart()
+{
+	AProgrammingDoorsGameModeBase* GameMode = Cast<AProgrammingDoorsGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GameMode)
+	{
+		CreateObjectiveWidgets();
+		DisplayObjectiveWidget();
+	}
 }
 
 void UObjectiveWorldSubsystem::OnObjectiveStateChanged(UObjectiveComponent* ObjectiveComponent, EObjectiveState ObjectiveState)
 {
-	DisplayObjectiveWidget();
+	if (Objectives.Num() == 0 || !Objectives.Contains(ObjectiveComponent))
+	{
+		return;
+	}
+
+	if (ObjectiveWidget && ObjectivesCompleteWidget)
+	{
+		if (GetCompletedObjectiveCount() == Objectives.Num())
+		{
+			DisplayObjectivesCompleteWidget();
+		}
+		DisplayObjectiveWidget();
+	}
 }

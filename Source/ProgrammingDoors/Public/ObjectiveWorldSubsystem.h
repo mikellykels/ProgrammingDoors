@@ -5,27 +5,25 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "Blueprint/UserWidget.h"
 #include "ObjectiveComponent.h"
 #include "ObjectiveWorldSubsystem.generated.h"
 
 /**
  * 
  */
+
+class UObjectiveComponent;
+class UObjectiveHud;
+class UUserWidget;
+
 UCLASS()
 class PROGRAMMINGDOORS_API UObjectiveWorldSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
 
 public:
-	void CreateObjectiveWidget(TSubclassOf<UUserWidget> ObjectiveWidgetClass);
-	void DisplayObjectiveWidget();
-
 	UFUNCTION(BlueprintCallable)
 	FString GetCurrentObjectiveDescription();
-
-	UFUNCTION(BlueprintCallable)
-	float GetScore();
 
 	UFUNCTION(BlueprintCallable)
 	void AddObjective(UObjectiveComponent* ObjectiveComponent);
@@ -33,14 +31,30 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveObjective(UObjectiveComponent* ObjectiveComponent);
 
-	void OnObjectiveStateChanged(UObjectiveComponent* ObjectiveComponent, EObjectiveState ObjectiveState);
+	UFUNCTION(BlueprintCallable)
+	void OnMapStart();
 
 private:
-	UUserWidget* ObjectiveWidget = nullptr;
-
+	UObjectiveHud* ObjectiveWidget = nullptr;
+	UUserWidget* ObjectivesCompleteWidget = nullptr;
 	// add/remove them
 	// sign up for callback onchanged
 	TArray<UObjectiveComponent*> Objectives;
 
 	float Score = 0.0f;
+
+protected:
+	virtual void Deinitialize() override;
+
+	void CreateObjectiveWidgets();
+
+	void DisplayObjectiveWidget();
+	void RemoveObjectiveWidget();
+
+	void DisplayObjectivesCompleteWidget();
+	void RemoveObjectivesCompleteWidget();
+
+	uint32 GetCompletedObjectiveCount();
+
+	void OnObjectiveStateChanged(UObjectiveComponent* ObjectiveComponent, EObjectiveState ObjectiveState);
 };
