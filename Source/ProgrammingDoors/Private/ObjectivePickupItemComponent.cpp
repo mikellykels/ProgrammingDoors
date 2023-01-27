@@ -40,16 +40,10 @@ void UObjectivePickupItemComponent::TickComponent(float DeltaTime, ELevelTick Ti
 
 void UObjectivePickupItemComponent::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("COMPONENT OVERLAP"));
 	Active = false;
 	GetOwner()->SetActorHiddenInGame(true);
 	GetOwner()->SetActorEnableCollision(false);
 
-	SetCollectedItem();
-}
-
-void UObjectivePickupItemComponent::SetCollectedItem()
-{
 	UObjectiveComponent* ObjectiveComponent = GetOwner()->FindComponentByClass<UObjectiveComponent>();
 	if (ObjectiveComponent)
 	{

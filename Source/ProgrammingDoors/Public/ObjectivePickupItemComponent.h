@@ -37,8 +37,6 @@ protected:
 	UPROPERTY(EditAnywhere, NoClear)
 	UCapsuleComponent* TriggerCapsule;
 
-	void SetCollectedItem();
-
 private:
 	UPROPERTY()
 	bool Active;

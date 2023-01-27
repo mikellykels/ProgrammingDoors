@@ -127,6 +127,11 @@ void UObjectiveWorldSubsystem::OnObjectiveStateChanged(UObjectiveComponent* Obje
 		return;
 	}
 
+	if (!ObjectiveWidget || !ObjectivesCompleteWidget)
+	{
+		return;
+	}
+
 	if (ObjectiveWidget && ObjectivesCompleteWidget)
 	{
 		if (GetCompletedObjectiveCount() == Objectives.Num())
@@ -134,7 +139,7 @@ void UObjectiveWorldSubsystem::OnObjectiveStateChanged(UObjectiveComponent* Obje
 			RemoveObjectiveWidget();
 			DisplayObjectivesCompleteWidget();
 		}
-		else
+		else if (ObjectiveWidget)
 		{
 			DisplayObjectiveWidget();
 		}

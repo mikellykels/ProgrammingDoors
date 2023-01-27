@@ -16,7 +16,6 @@ UWinComponent::UWinComponent()
 	TriggerCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Trigger Capsule"));
 	TriggerCapsule->InitCapsuleSize(125.0f, 125.0f);
 	TriggerCapsule->OnComponentBeginOverlap.AddDynamic(this, &UWinComponent::OnOverlapBegin);
-	TriggerCapsule->OnComponentEndOverlap.AddDynamic(this, &UWinComponent::OnOverlapEnd);
 }
 
 
@@ -45,10 +44,13 @@ void UWinComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 void UWinComponent::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	DisplayWinWidget();
+
+	GetWorld()->GetTimerManager().SetTimer(RestartGameTimerHandle, this, &UWinComponent::OnWinTimerFinished, TimeRestartGameAfterWin, false);
 }
 
-void UWinComponent::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void UWinComponent::OnWinTimerFinished()
 {
+	UGameplayStatics::OpenLevel(GetWorld(), "WinMenuLevel");
 }
 
 void UWinComponent::DisplayWinWidget()
