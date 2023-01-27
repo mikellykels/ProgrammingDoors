@@ -34,6 +34,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnMapStart();
 
+	uint32 GetCompletedObjectiveCount();
+
 private:
 	UObjectiveHud* ObjectiveWidget = nullptr;
 	UUserWidget* ObjectivesCompleteWidget = nullptr;
@@ -53,8 +55,6 @@ protected:
 
 	void DisplayObjectivesCompleteWidget();
 	void RemoveObjectivesCompleteWidget();
-
-	uint32 GetCompletedObjectiveCount();
 
 	void OnObjectiveStateChanged(UObjectiveComponent* ObjectiveComponent, EObjectiveState ObjectiveState);
 };

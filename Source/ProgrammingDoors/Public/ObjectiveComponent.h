@@ -9,9 +9,9 @@
 UENUM()
 enum class EObjectiveState
 {
-	OS_Inactive = 0   UMETA(DisplayName = "Inactive"),
-	OS_Active = 1     UMETA(DisplayName = "Active"),
-	OS_Completed = 2  UMETA(DisplayName = "Completed"),
+	OS_Inactive = 0     UMETA(DisplayName = "Inactive"),
+	OS_Active = 1       UMETA(DisplayName = "Active"),
+	OS_Completed = 2    UMETA(DisplayName = "Completed"),
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )

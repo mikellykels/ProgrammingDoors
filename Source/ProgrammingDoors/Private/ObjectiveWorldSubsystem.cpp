@@ -20,7 +20,6 @@ void UObjectiveWorldSubsystem::CreateObjectiveWidgets()
 		AProgrammingDoorsGameModeBase* GameMode = Cast<AProgrammingDoorsGameModeBase>(GetWorld()->GetAuthGameMode());
 		if (GameMode)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("IN GAME MODE"));
 			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 			ObjectiveWidget = CreateWidget<UObjectiveHud>(PlayerController, GameMode->ObjectiveWidgetClass);
 			ObjectivesCompleteWidget = CreateWidget<UUserWidget>(PlayerController, GameMode->ObjectivesCompleteWidgetClass);
@@ -132,8 +131,12 @@ void UObjectiveWorldSubsystem::OnObjectiveStateChanged(UObjectiveComponent* Obje
 	{
 		if (GetCompletedObjectiveCount() == Objectives.Num())
 		{
+			RemoveObjectiveWidget();
 			DisplayObjectivesCompleteWidget();
 		}
-		DisplayObjectiveWidget();
+		else
+		{
+			DisplayObjectiveWidget();
+		}
 	}
 }

@@ -19,7 +19,6 @@ AAbstractionPlayerCharacter::AAbstractionPlayerCharacter()
 void AAbstractionPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -33,11 +32,11 @@ void AAbstractionPlayerCharacter::Tick(float DeltaTime)
 void AAbstractionPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AAbstractionPlayerCharacter::FellOutOfWorld(const class UDamageType& dmgType)
 {
+	HealthComponent->SetCurrentHealth(0.0f);
 	OnDeath(true);
 }
 
@@ -45,7 +44,7 @@ float AAbstractionPlayerCharacter::TakeDamage(float DamageAmount, struct FDamage
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("%.2f Damage!"), Damage));
-	if (HealthComponent)
+	if (HealthComponent && !HealthComponent->IsDead())
 	{
 		HealthComponent->TakeDamage(Damage);
 		HealthComponent->TakeDamageEvent();
@@ -63,7 +62,35 @@ void AAbstractionPlayerCharacter::OnDeath(bool IsFellOut)
 	APlayerController* PlayerController = GetController<APlayerController>();
 	if (PlayerController)
 	{
+		PlayerController->DisableInput(PlayerController);
+	}
+	GetWorld()->GetTimerManager().SetTimer(RestartLevelTimerHandle, this, &AAbstractionPlayerCharacter::OnDeathTimerFinished, TimeRestartLevelAfterDeath, false);
+}
+
+void AAbstractionPlayerCharacter::OnDeathTimerFinished()
+{
+	APlayerController* PlayerController = GetController<APlayerController>();
+	if (PlayerController)
+	{
 		PlayerController->RestartLevel();
 	}
+}
+
+const bool AAbstractionPlayerCharacter::IsAlive() const
+{
+	if (HealthComponent)
+	{
+		return !HealthComponent->IsDead();
+	}
+	return false;
+}
+
+const float AAbstractionPlayerCharacter::GetCurrentHealth() const
+{
+	if (HealthComponent)
+	{
+		return HealthComponent->GetCurrentHealth();
+	}
+	return 0.0f;
 }
 

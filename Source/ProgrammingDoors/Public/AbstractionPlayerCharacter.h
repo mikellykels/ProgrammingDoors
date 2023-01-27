@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "HealthComponent.h"
+#include "ObjectivePickupItem.h"
 #include "AbstractionPlayerCharacter.generated.h"
 
 class UHealthComponent;
@@ -31,10 +32,23 @@ public:
 	UPROPERTY(EditAnywhere)
 	UHealthComponent* HealthComponent;
 
+	UFUNCTION(BlueprintCallable)
+	const bool IsAlive() const;
+
+	UFUNCTION(BlueprintCallable)
+	const float GetCurrentHealth() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void OnDeath(bool IsFellOut);
 
+	UFUNCTION()
+	void OnDeathTimerFinished();
+
+	UPROPERTY(EditAnywhere)
+	float TimeRestartLevelAfterDeath = 5.0f;
+
+	FTimerHandle RestartLevelTimerHandle;
 };

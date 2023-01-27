@@ -48,6 +48,11 @@ public:
 		return MaxHealth;
 	}
 
+	void SetCurrentHealth(float Health)
+	{
+		CurrentHealth = Health;
+	}
+
 	FOnDamageTaken ChangedDamageEvent;
 
 private:
