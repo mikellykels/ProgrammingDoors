@@ -51,7 +51,7 @@ void UObjectiveWorldSubsystem::DisplayObjectivesCompleteWidget()
 {
 	if (ObjectivesCompleteWidget)
 	{
-		ObjectivesCompleteWidget->AddToViewport();
+		ObjectivesCompleteWidget->AddToViewport(1);
 	}
 }
 
@@ -116,8 +116,14 @@ void UObjectiveWorldSubsystem::OnMapStart()
 	if (GameMode)
 	{
 		CreateObjectiveWidgets();
-		DisplayObjectiveWidget();
+
+		GetWorld()->GetTimerManager().SetTimer(WidgetTimerHandle, this, &UObjectiveWorldSubsystem::AddWidget, 1.f, false, 15.0f);
 	}
+}
+
+void UObjectiveWorldSubsystem::AddWidget()
+{
+	DisplayObjectiveWidget();
 }
 
 void UObjectiveWorldSubsystem::OnObjectiveStateChanged(UObjectiveComponent* ObjectiveComponent, EObjectiveState ObjectiveState)

@@ -36,6 +36,8 @@ public:
 
 	uint32 GetCompletedObjectiveCount();
 
+	void AddWidget();
+
 private:
 	UObjectiveHud* ObjectiveWidget = nullptr;
 	UUserWidget* ObjectivesCompleteWidget = nullptr;
@@ -57,4 +59,6 @@ protected:
 	void RemoveObjectivesCompleteWidget();
 
 	void OnObjectiveStateChanged(UObjectiveComponent* ObjectiveComponent, EObjectiveState ObjectiveState);
+
+	FTimerHandle WidgetTimerHandle;
 };

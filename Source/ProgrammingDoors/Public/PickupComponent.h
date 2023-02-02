@@ -21,6 +21,7 @@ public:
 
 	void Countdown();
 	void AddTime();
+	void AddWidget();
 	bool Triggered = false;
 
 	int GetMinutes() const
@@ -60,6 +61,7 @@ protected:
 	int Seconds = 0;
 
 	FTimerHandle TimerHandle;
+	FTimerHandle WidgetTimerHandle;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSubclassOf<UTimerWidget> TimerWidgetClass = nullptr;

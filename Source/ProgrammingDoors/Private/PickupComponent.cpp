@@ -31,9 +31,9 @@ void UPickupComponent::BeginPlay()
 	if (IsValid(TimerWidgetClass))
 	{
 		TimerWidget = CreateWidget<UTimerWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), TimerWidgetClass);
-		TimerWidget->AddToViewport(0);
+		GetWorld()->GetTimerManager().SetTimer(WidgetTimerHandle, this, &UPickupComponent::AddWidget, 1.f, false, 16.0f);
 	}
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UPickupComponent::Countdown, 1.f, true, 0.0);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UPickupComponent::Countdown, 1.f, true, 16.0f);
 }
 
 void UPickupComponent::Countdown()
@@ -81,6 +81,11 @@ void UPickupComponent::AddTime()
 			Seconds = Seconds - 60;
 		}
 	}
+}
+
+void UPickupComponent::AddWidget()
+{
+	TimerWidget->AddToViewport(0);
 }
 
 void UPickupComponent::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

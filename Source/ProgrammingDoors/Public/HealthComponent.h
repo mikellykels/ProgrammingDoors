@@ -24,6 +24,7 @@ public:
 	}
 
 	void DisplayHealth();
+	void AddWidget();
 
 	void TakeDamage(float Damage)
 	{
@@ -65,6 +66,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSubclassOf<UHealthWidget> HealthWidgetClass = nullptr;
+
+	FTimerHandle WidgetTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float MaxHealth = 100.0f;

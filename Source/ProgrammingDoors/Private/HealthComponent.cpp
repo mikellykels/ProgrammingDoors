@@ -22,6 +22,11 @@ void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetWorld()->GetTimerManager().SetTimer(WidgetTimerHandle, this, &UHealthComponent::AddWidget, 1.f, false, 15.0f);
+}
+
+void UHealthComponent::AddWidget()
+{
 	if (IsValid(HealthWidgetClass))
 	{
 		HealthWidget = CreateWidget<UHealthWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), HealthWidgetClass);
@@ -29,7 +34,6 @@ void UHealthComponent::BeginPlay()
 
 		DisplayHealth();
 	}
-	
 }
 
 void UHealthComponent::DisplayHealth()

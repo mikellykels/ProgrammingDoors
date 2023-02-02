@@ -39,15 +39,16 @@ void UObjectivePickupItemComponent::TickComponent(float DeltaTime, ELevelTick Ti
 }
 
 void UObjectivePickupItemComponent::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
+{	
+	TWeakObjectPtr<UObjectiveComponent> ObjectiveComponent;
+	ObjectiveComponent = GetOwner()->FindComponentByClass<UObjectiveComponent>();
+	if (ObjectiveComponent == nullptr)
+	{
+		return;
+	}
+	ObjectiveComponent->SetState(EObjectiveState::OS_Completed);
 	Active = false;
 	GetOwner()->SetActorHiddenInGame(true);
 	GetOwner()->SetActorEnableCollision(false);
-
-	UObjectiveComponent* ObjectiveComponent = GetOwner()->FindComponentByClass<UObjectiveComponent>();
-	if (ObjectiveComponent)
-	{
-		ObjectiveComponent->SetState(EObjectiveState::OS_Completed);
-	}
 	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Item Collected"));
 }
