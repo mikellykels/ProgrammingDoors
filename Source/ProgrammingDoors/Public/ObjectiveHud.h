@@ -21,6 +21,9 @@ public:
 	void UpdateObjectiveText(uint32 ObjectivesCompleted, uint32 TotalObjectives);
 	
 protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateObjectiveImage();
+
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ObjectivesText;
 };

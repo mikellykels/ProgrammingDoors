@@ -9,5 +9,9 @@ void UObjectiveHud::UpdateObjectiveText(uint32 ObjectivesCompleted, uint32 Total
 	if (ObjectivesText)
 	{
 		ObjectivesText->SetText(FText::Format(FTextFormat::FromString("{0} / {1}"), ObjectivesCompleted, TotalObjectives));
+		if (ObjectivesCompleted > 0 && ObjectivesCompleted <= TotalObjectives)
+		{
+			UpdateObjectiveImage();
+		}
 	}
 }

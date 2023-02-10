@@ -31,4 +31,3 @@ void APickupItemActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-

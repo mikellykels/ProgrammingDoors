@@ -51,4 +51,9 @@ void UHealthComponent::TakeDamageEvent()
 	ChangedDamageEvent.Broadcast(this);
 }
 
+void UHealthComponent::SetCurrentHealth(float Health)
+{
+	CurrentHealth = Health;
+}
+
 

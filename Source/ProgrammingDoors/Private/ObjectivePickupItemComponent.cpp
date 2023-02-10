@@ -50,5 +50,4 @@ void UObjectivePickupItemComponent::OnOverlapBegin(class UPrimitiveComponent* Ov
 	Active = false;
 	GetOwner()->SetActorHiddenInGame(true);
 	GetOwner()->SetActorEnableCollision(false);
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Item Collected"));
 }

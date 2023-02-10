@@ -10,11 +10,16 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine",
-				"UMG"
+				"UMG",
+				"GameplayCameras"
 			]
 		}
 	],
 	"Plugins": [
+		{
+			"Name": "GameplayCameras",
+			"Enabled": true
+		},
 		{
 			"Name": "ModelingToolsEditorMode",
 			"Enabled": true,

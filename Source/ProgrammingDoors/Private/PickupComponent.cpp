@@ -31,7 +31,7 @@ void UPickupComponent::BeginPlay()
 	if (IsValid(TimerWidgetClass))
 	{
 		TimerWidget = CreateWidget<UTimerWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), TimerWidgetClass);
-		GetWorld()->GetTimerManager().SetTimer(WidgetTimerHandle, this, &UPickupComponent::AddWidget, 1.f, false, 16.0f);
+		GetWorld()->GetTimerManager().SetTimer(WidgetTimerHandle, this, &UPickupComponent::AddWidget, 1.f, false, 15.0f);
 	}
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UPickupComponent::Countdown, 1.f, true, 16.0f);
 }
@@ -47,7 +47,6 @@ void UPickupComponent::Countdown()
 		if (Minutes == 0)
 		{
 			// restart level if timer finished
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("GAME OVER!"));
 			UGameplayStatics::OpenLevel(GetWorld(), "MazeLevel");
 		}
 		else
@@ -92,6 +91,8 @@ void UPickupComponent::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp,
 {
 	AddTime();
 	Triggered = true;
+	GetOwner()->SetActorHiddenInGame(true);
+	GetOwner()->SetActorEnableCollision(false);
 }
 
 void UPickupComponent::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

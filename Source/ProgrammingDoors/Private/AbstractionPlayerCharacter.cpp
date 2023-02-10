@@ -5,6 +5,8 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/DamageType.h"
 #include "HealthComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 
 // Sets default values
 AAbstractionPlayerCharacter::AAbstractionPlayerCharacter()
@@ -19,6 +21,8 @@ AAbstractionPlayerCharacter::AAbstractionPlayerCharacter()
 void AAbstractionPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PC = GetWorld()->GetFirstPlayerController();
 }
 
 // Called every frame
@@ -36,21 +40,23 @@ void AAbstractionPlayerCharacter::SetupPlayerInputComponent(UInputComponent* Pla
 
 void AAbstractionPlayerCharacter::FellOutOfWorld(const class UDamageType& dmgType)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Fell out"));
 	HealthComponent->SetCurrentHealth(0.0f);
+	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
 	OnDeath(true);
 }
 
 float AAbstractionPlayerCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, FString::Printf(TEXT("%.2f Damage!"), Damage));
 	if (HealthComponent && !HealthComponent->IsDead())
 	{
 		HealthComponent->TakeDamage(Damage);
 		HealthComponent->TakeDamageEvent();
+		PC->PlayerCameraManager->StartCameraShake(CamShake, 3.0f);
+		OnDamage();
 		if (HealthComponent->IsDead())
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red,TEXT("GAME OVER!"));
 			OnDeath(false);
 		}
 	}
@@ -62,6 +68,7 @@ void AAbstractionPlayerCharacter::OnDeath(bool IsFellOut)
 	APlayerController* PlayerController = GetController<APlayerController>();
 	if (PlayerController)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("On Death"));
 		PlayerController->DisableInput(PlayerController);
 	}
 	GetWorld()->GetTimerManager().SetTimer(RestartLevelTimerHandle, this, &AAbstractionPlayerCharacter::OnDeathTimerFinished, TimeRestartLevelAfterDeath, false);
@@ -92,5 +99,18 @@ const float AAbstractionPlayerCharacter::GetCurrentHealth() const
 		return HealthComponent->GetCurrentHealth();
 	}
 	return 0.0f;
+}
+void AAbstractionPlayerCharacter::HandleDamage()
+{
+	OnDamage();
+}
+
+void AAbstractionPlayerCharacter::HandleItemCollected()
+{
+	ItemsCollected++;
+	// Play Effects here.
+	PC->PlayerCameraManager->StartCameraShake(CamShake, 1.0f);
+
+	ItemCollected();
 }
 

@@ -44,6 +44,8 @@ void UWinComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 void UWinComponent::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	DisplayWinWidget();
+	GetOwner()->SetActorHiddenInGame(true);
+	GetOwner()->SetActorEnableCollision(false);
 
 	GetWorld()->GetTimerManager().SetTimer(RestartGameTimerHandle, this, &UWinComponent::OnWinTimerFinished, TimeRestartGameAfterWin, false);
 }

@@ -39,7 +39,10 @@ public:
 	void AddWidget();
 
 private:
+	UPROPERTY()
 	UObjectiveHud* ObjectiveWidget = nullptr;
+
+	UPROPERTY()
 	UUserWidget* ObjectivesCompleteWidget = nullptr;
 	// add/remove them
 	// sign up for callback onchanged
@@ -61,4 +64,5 @@ protected:
 	void OnObjectiveStateChanged(UObjectiveComponent* ObjectiveComponent, EObjectiveState ObjectiveState);
 
 	FTimerHandle WidgetTimerHandle;
+	FTimerHandle RemoveWidgetTimerHandle;
 };

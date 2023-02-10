@@ -52,6 +52,7 @@ void UObjectiveWorldSubsystem::DisplayObjectivesCompleteWidget()
 	if (ObjectivesCompleteWidget)
 	{
 		ObjectivesCompleteWidget->AddToViewport(1);
+		GetWorld()->GetTimerManager().SetTimer(RemoveWidgetTimerHandle, this, &UObjectiveWorldSubsystem::RemoveObjectivesCompleteWidget, 1.f, false, 5.0f);
 	}
 }
 
