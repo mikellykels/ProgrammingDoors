@@ -1,5 +1,5 @@
 # CGS - Game Programming
-CG Spectrum Intermediate Game Programming Term 2
+CG Spectrum Game Programming Term 1
 
 - Week 2 - Programming Doors  
 - Week 3 - Doors vis Blueprints  
